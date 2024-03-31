@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-collections4-4.4.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-collections4-4.4-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-collections4-4.4-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-compress-1.26.1.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-compress-1.26.1-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/commons-compress-1.26.1-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/log4j-api-2.21.1.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/pdfbox-app-3.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-examples-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-excelant-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-javadoc-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-ooxml-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-ooxml-full-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-ooxml-lite-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/poi-scratchpad-5.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/xmlbeans-5.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/xmlbeans-5.2.0-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Personal/STATEMENT CONVERTER/bank-statement-converter/lib/xmlbeans-5.2.0-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
