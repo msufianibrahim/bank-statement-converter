@@ -1,9 +1,12 @@
 package com.sufian.statementconverter;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+
 
 public class PDFConverterGUI extends JFrame {
     /**
@@ -16,9 +19,18 @@ public class PDFConverterGUI extends JFrame {
     private JButton chooseFileButton, chooseOutputPathButton, convertButton;
 	protected static final String MAYBANK_CREDIT = "MAYBANK CREDIT";
 	protected static final String MAYBANK_DEBIT = "MAYBANK DEBIT";
-
+	protected static final String CIMB_CREDIT = "CIMB CREDIT";
+	String globalInputFilePath = "";
 
     public PDFConverterGUI() {
+    	
+    	try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         // Set window title
         setTitle("PDF Converter");
 
@@ -30,7 +42,7 @@ public class PDFConverterGUI extends JFrame {
         inputFileLabel = new JLabel("Input File:");
         outputPathLabel = new JLabel("Output Path:");
 
-        String[] statementTypes = {MAYBANK_CREDIT, MAYBANK_DEBIT}; // Add your statement types here
+        String[] statementTypes = {MAYBANK_CREDIT, MAYBANK_DEBIT, CIMB_CREDIT}; // Add your statement types here
         statementTypeComboBox = new JComboBox<>(statementTypes);
 
         inputFileTextField = new JTextField(20);
@@ -42,17 +54,28 @@ public class PDFConverterGUI extends JFrame {
         chooseFileButton = new JButton("Choose File");
         chooseOutputPathButton = new JButton("Choose Output Path");
         convertButton = new JButton("Convert");
+        
 
         // Add action listeners
         chooseFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File("C:\\"));
+                String inputPath = "";
+                if(!globalInputFilePath.equals("") && globalInputFilePath != null) {
+                	inputPath = globalInputFilePath;
+                } else {
+                	inputPath = "C:\\";
+                }
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PDF Files", "pdf");
+                fileChooser.setFileFilter(filter);
+                fileChooser.setCurrentDirectory(new File(inputPath));
                 int result = fileChooser.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     inputFileTextField.setText(selectedFile.getAbsolutePath());
                 }
+                String absoluteInputFilePath = inputFileTextField.getText();
+                globalInputFilePath = absoluteInputFilePath.substring(0, absoluteInputFilePath.lastIndexOf('\\'));
             }
         });
 
@@ -60,7 +83,13 @@ public class PDFConverterGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileChooser = new JFileChooser();
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                fileChooser.setCurrentDirectory(new File("C:\\"));
+                String outputPath = "";
+                if(!globalInputFilePath.equals("") && globalInputFilePath != null) {
+                	outputPath = globalInputFilePath;
+                } else {
+                	outputPath = "C:\\";
+                }
+                fileChooser.setCurrentDirectory(new File(outputPath));
                 int result = fileChooser.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
@@ -75,13 +104,16 @@ public class PDFConverterGUI extends JFrame {
                 String selectedStatementType = (String) statementTypeComboBox.getSelectedItem();
 
                 // Get the absolute path of the input file
-                String inputFilePath = inputFileTextField.getText();
+                String absoluteInputFilePath = inputFileTextField.getText();
+                System.out.println(absoluteInputFilePath);
 
                 // Extract the file name from the input file path
-                String inputFileNameWithExtension = new File(inputFilePath).getName();
+                String inputFileNameWithExtension = new File(absoluteInputFilePath).getName();
 
                 // Remove the file extension from the input file name
                 String inputFileName = inputFileNameWithExtension.substring(0, inputFileNameWithExtension.lastIndexOf('.'));
+                
+                //String inputFilePath = inputFileName.substring(0, inputFileName.lastIndexOf('\\'));
 
                 // Get the selected output directory
                 String outputDirectory = outputPathTextField.getText();
@@ -93,7 +125,7 @@ public class PDFConverterGUI extends JFrame {
                 // Example:
                 // PDFReader.readPDF(inputFilePath);
                 // TransactionExtractor.extractTransactions(inputFilePath, outputFilePath);
-        		PDFReader.readPDF(selectedStatementType, inputFilePath, outputFilePath);
+        		PDFReader.readPDF(selectedStatementType, absoluteInputFilePath, outputFilePath);
             }
         });
 
@@ -102,6 +134,7 @@ public class PDFConverterGUI extends JFrame {
 
         // Create panel to hold components
         JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.add(statementTypeLabel);
         panel.add(statementTypeComboBox);
         panel.add(inputFileLabel);
