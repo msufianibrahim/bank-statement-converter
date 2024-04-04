@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TransactionExtractor {
-    public static List<Transaction> extractMaybankCreditTransactions(String text) {
+	public static List<Transaction> extractMaybankCreditTransactions(String text) {
         List<Transaction> transactions = new ArrayList<>();
 
         // Define pattern for transaction entries
@@ -205,6 +205,7 @@ public class TransactionExtractor {
             }
 
             System.out.println("Excel file created successfully.");
+            JOptionPane.showMessageDialog(null, "Excel created successfully");
         } catch (IOException e) {
             e.printStackTrace();
         }
