@@ -31,6 +31,8 @@ public class PDFReader {
             	TransactionExtractor.createExcel(TransactionExtractor.extractMaybankDebitTransactions(text), outputPath);
             } else if(fileType.equals(PDFConverterGUI.CIMB_CREDIT)) {
             	TransactionExtractor.createExcel(TransactionExtractor.extractCIMBCreditTransactions(text), outputPath);
+            } else if(fileType.equals(PDFConverterGUI.TOUCHNGO)) {
+            	TransactionExtractor.createExcel(TransactionExtractor.extractTouchNGoTransactions(text), outputPath);
             }
 
             System.out.println("Transactions extracted and written to Excel successfully.");
