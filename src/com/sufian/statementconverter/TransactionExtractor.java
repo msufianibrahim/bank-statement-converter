@@ -14,7 +14,7 @@ public class TransactionExtractor {
         List<Transaction> transactions = new ArrayList<>();
 
         // Define pattern for transaction entries
-        Pattern transactionPattern = Pattern.compile("(\\d{2}/\\d{2})\\s+(\\d{2}/\\d{2})\\s+(.*?)\\s+((?:-)?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})(?!%))\\s*(CR)?");
+        Pattern transactionPattern = Pattern.compile("(\\d{2} [A-Z]{3}) (\\d{2}) (\\d{2}) (\\d{2} [A-Z]{3}) ((?:.*?)(?:\\R\\s*.*?)*?)\\s+(\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))\\s*(CR)?");        // Create matcher for transaction entries
 
         // Create matcher for transaction entries
         Matcher matcher = transactionPattern.matcher(text);
@@ -66,17 +66,22 @@ public class TransactionExtractor {
                 String description = matcher.group(2);
                 String amountStr = matcher.group(3);
                 String sign = matcher.group(4);
+                String crIndicator = matcher.group(5);
                 if(matcher.find(matcher.end())) {
                 	previousIndex = currentIndex;
                 	currentIndex = matcher.start();
                 }
                 
                 // Get details for the current transaction
-                String details = extractDetails(text, previousIndex, currentIndex);
+                String details = extractMaybankDebitDetails(text, previousIndex, currentIndex);
 
                 // Remove commas from the amount
                 String amount = amountStr.replaceAll(",", "");
-
+                
+                // Add negative sign if CR indicator is present
+                if (crIndicator != null && !crIndicator.isEmpty()) {
+                    amount = "-" + amount;
+                }
                 // Add negative sign if needed
                 if ("-".equals(sign)) {
                     amount = "-" + amount;
@@ -92,8 +97,37 @@ public class TransactionExtractor {
 
         return transactions;
     }
+    public static List<Transaction> extractCIMBCreditTransactions(String text) {
+        List<Transaction> transactions = new ArrayList<>();
 
-    private static String extractDetails(String text, int startIndex, int endIndex) {
+        // Define pattern for transaction entries
+        Pattern pattern = Pattern.compile("(\\d{2} [A-Z]{3}) (\\d{2} [A-Z]{3}) ((?:.*?)(?:\\R\\s*.*?)*?)\\s*((?:-)?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))\\s+(CR)?");        // Create matcher for transaction entries
+        Matcher matcher = pattern.matcher(text);
+        
+
+        // Iterate through each match and extract transaction information
+        while (matcher.find()) {
+        	
+        	String transactionDate = matcher.group(2);
+            String description = matcher.group(3);
+            String amountStr = matcher.group(4);
+            String crIndicator = matcher.group(5);
+            
+            // Remove commas from the amount and trim whitespace
+            String amount = amountStr.replaceAll(",", "").trim();
+            
+            // Add negative sign if CR indicator is present
+            if (crIndicator != null && !crIndicator.isEmpty()) {
+                amount = "-" + amount;
+            }
+            // Create Transaction object and add to list
+            Transaction transaction = new Transaction(transactionDate, description, amount);
+            transactions.add(transaction);
+        }
+
+        return transactions;
+    }
+    private static String extractMaybankDebitDetails(String text, int startIndex, int endIndex) {
         // Extract details from text between startIndex and endIndex
         String details = text.substring(startIndex, endIndex).trim();
         // Remove empty lines and trim whitespace
@@ -119,6 +153,7 @@ public class TransactionExtractor {
             headerRow.createCell(0).setCellValue("Transaction Date");
             headerRow.createCell(1).setCellValue("Description");
             headerRow.createCell(2).setCellValue("Amount");
+//            int longestDescriptionLength = 0;
 
             // Write transaction data
             int rowNum = 1;
@@ -126,8 +161,14 @@ public class TransactionExtractor {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(transaction.getTransactionDate());
                 row.createCell(1).setCellValue(transaction.getDescription());
+//                if(transaction.getDescription().length() > longestDescriptionLength) {
+//                	longestDescriptionLength = transaction.getDescription().length();
+                	sheet.autoSizeColumn(1);
+//                }
                 row.createCell(2).setCellValue(transaction.getAmount());
             }
+            
+            sheet.autoSizeColumn(0);
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
