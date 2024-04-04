@@ -20,6 +20,8 @@ public class PDFConverterGUI extends JFrame {
 	protected static final String MAYBANK_CREDIT = "MAYBANK CREDIT";
 	protected static final String MAYBANK_DEBIT = "MAYBANK DEBIT";
 	protected static final String CIMB_CREDIT = "CIMB CREDIT";
+	protected static final String TOUCHNGO = "TOUCH N GO";
+	
 	String globalInputFilePath = "";
 
     public PDFConverterGUI() {
@@ -42,7 +44,7 @@ public class PDFConverterGUI extends JFrame {
         inputFileLabel = new JLabel("Input File:");
         outputPathLabel = new JLabel("Output Path:");
 
-        String[] statementTypes = {MAYBANK_CREDIT, MAYBANK_DEBIT, CIMB_CREDIT}; // Add your statement types here
+        String[] statementTypes = {"Choose statement type", CIMB_CREDIT, MAYBANK_CREDIT, MAYBANK_DEBIT, TOUCHNGO}; // Add your statement types here
         statementTypeComboBox = new JComboBox<>(statementTypes);
 
         inputFileTextField = new JTextField(20);
@@ -104,28 +106,29 @@ public class PDFConverterGUI extends JFrame {
                 String selectedStatementType = (String) statementTypeComboBox.getSelectedItem();
 
                 // Get the absolute path of the input file
-                String absoluteInputFilePath = inputFileTextField.getText();
+                String absoluteInputFilePath =	inputFileTextField.getText();
                 System.out.println(absoluteInputFilePath);
-
+                String inputFileName = "";
                 // Extract the file name from the input file path
-                String inputFileNameWithExtension = new File(absoluteInputFilePath).getName();
-
-                // Remove the file extension from the input file name
-                String inputFileName = inputFileNameWithExtension.substring(0, inputFileNameWithExtension.lastIndexOf('.'));
+                if(!absoluteInputFilePath.equals("")) {
+                	String inputFileNameWithExtension = new File(absoluteInputFilePath).getName();
                 
-                //String inputFilePath = inputFileName.substring(0, inputFileName.lastIndexOf('\\'));
+                	// Remove the file extension from the input file name
+                	inputFileName = inputFileNameWithExtension.substring(0, inputFileNameWithExtension.lastIndexOf('.'));
+                }
 
                 // Get the selected output directory
                 String outputDirectory = outputPathTextField.getText();
-
-                // Create the output file path by appending the input file name to the output directory
-                String outputFilePath = outputDirectory + File.separator + inputFileName + ".xlsx";
-
-                // Call the PDF conversion method here with input and output file paths
-                // Example:
-                // PDFReader.readPDF(inputFilePath);
-                // TransactionExtractor.extractTransactions(inputFilePath, outputFilePath);
-        		PDFReader.readPDF(selectedStatementType, absoluteInputFilePath, outputFilePath);
+                String outputFilePath = "";
+                if(!outputDirectory.equals("")) {
+                	// Create the output file path by appending the input file name to the output directory
+                	outputFilePath = outputDirectory + File.separator + inputFileName + ".xlsx";
+                }
+                if(!absoluteInputFilePath.equals("") && !outputFilePath.equals("") && !selectedStatementType.equals("Choose statement type")) {
+                	PDFReader.readPDF(selectedStatementType, absoluteInputFilePath, outputFilePath);
+                } else {
+                	JOptionPane.showMessageDialog(null, "Please select a valid bank statement type, a bank statement file and a directory for output file");
+                }
             }
         });
 

@@ -14,8 +14,7 @@ public class TransactionExtractor {
         List<Transaction> transactions = new ArrayList<>();
 
         // Define pattern for transaction entries
-        Pattern transactionPattern = Pattern.compile("(\\d{2} [A-Z]{3}) (\\d{2}) (\\d{2}) (\\d{2} [A-Z]{3}) ((?:.*?)(?:\\R\\s*.*?)*?)\\s+(\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))\\s*(CR)?");        // Create matcher for transaction entries
-
+        Pattern transactionPattern = Pattern.compile("(\\d{2}/\\d{2})\\s+(\\d{2}/\\d{2})\\s+(.*?)\\s+((?:-)?\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})(?!%))\\s*(CR)?");
         // Create matcher for transaction entries
         Matcher matcher = transactionPattern.matcher(text);
 
@@ -127,6 +126,39 @@ public class TransactionExtractor {
 
         return transactions;
     }
+    public static List<Transaction> extractTouchNGoTransactions(String text) {
+        List<Transaction> transactions = new ArrayList<>();
+
+        // Define pattern for transaction entries
+        Pattern transactionPattern = Pattern.compile("(\\d{1,2}/\\d{1,2}/\\d{4})\\s+(.*?)(?=\\s+RM\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))\\s+(RM\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))\\s+(RM\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2}))", Pattern.DOTALL);
+        Matcher matcher = transactionPattern.matcher(text);
+
+        // Iterate through each match and extract transaction information
+        while (matcher.find()) {
+            String transactionDate = matcher.group(1);
+            String description = matcher.group(2);
+            String amountStr = matcher.group(3);
+            String walletBalance = matcher.group(4);
+
+            // Remove commas from the amount
+            String amount = amountStr.replaceAll(",", "");
+
+            // Add negative sign if Reload is present
+            if (description.contains("Reload")) {
+                amount = "-" + amount;
+            }
+            // Skip transaction if GO+ is present
+            if (description.contains("GO+ Daily Earnings") || description.contains("GO+ Cash In")) {
+                continue;
+            }
+
+            // Create Transaction object and add to list
+            Transaction transaction = new Transaction(transactionDate, description, amount);
+            transactions.add(transaction);
+        }
+
+        return transactions;
+    }
     private static String extractMaybankDebitDetails(String text, int startIndex, int endIndex) {
         // Extract details from text between startIndex and endIndex
         String details = text.substring(startIndex, endIndex).trim();
@@ -161,10 +193,7 @@ public class TransactionExtractor {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(transaction.getTransactionDate());
                 row.createCell(1).setCellValue(transaction.getDescription());
-//                if(transaction.getDescription().length() > longestDescriptionLength) {
-//                	longestDescriptionLength = transaction.getDescription().length();
-                	sheet.autoSizeColumn(1);
-//                }
+                sheet.autoSizeColumn(1);
                 row.createCell(2).setCellValue(transaction.getAmount());
             }
             
