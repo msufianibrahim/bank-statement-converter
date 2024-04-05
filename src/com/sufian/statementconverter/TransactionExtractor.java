@@ -67,7 +67,6 @@ public class TransactionExtractor {
                 String description = matcher.group(2);
                 String amountStr = matcher.group(3);
                 String sign = matcher.group(4);
-                String crIndicator = matcher.group(5);
                 if(matcher.find(matcher.end())) {
                 	previousIndex = currentIndex;
                 	currentIndex = matcher.start();
@@ -79,10 +78,6 @@ public class TransactionExtractor {
                 // Remove commas from the amount
                 String amount = amountStr.replaceAll(",", "");
                 
-                // Add negative sign if CR indicator is present
-                if (crIndicator != null && !crIndicator.isEmpty()) {
-                    amount = "-" + amount;
-                }
                 // Add negative sign if needed
                 if ("-".equals(sign)) {
                     amount = "-" + amount;
