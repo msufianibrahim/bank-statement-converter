@@ -35,9 +35,10 @@ public class TransactionExtractor {
             if (crIndicator != null && !crIndicator.isEmpty()) {
                 amount = "-" + amount;
             }
+            double doubleAmount = Double.valueOf(amount);
 
             // Create Transaction object and add to list
-            Transaction transaction = new Transaction(transactionDate, description, amount);
+            Transaction transaction = new Transaction(transactionDate, description, doubleAmount);
             transactions.add(transaction);
         }
 
@@ -82,9 +83,11 @@ public class TransactionExtractor {
                 if ("-".equals(sign)) {
                     amount = "-" + amount;
                 }
+                
+                double doubleAmount = Double.valueOf(amount);
 
                 // Create Transaction object and add to list
-                Transaction transaction = new Transaction(transactionDate, description + " : " + details, amount);
+                Transaction transaction = new Transaction(transactionDate, description + " : " + details, doubleAmount);
                 transactions.add(transaction);
 
                 // Update start index for next iteration
@@ -112,12 +115,14 @@ public class TransactionExtractor {
             // Remove commas from the amount and trim whitespace
             String amount = amountStr.replaceAll(",", "").trim();
             
+            
             // Add negative sign if CR indicator is present
             if (crIndicator != null && !crIndicator.isEmpty()) {
                 amount = "-" + amount;
             }
+            double doubleAmount = Double.valueOf(amount);
             // Create Transaction object and add to list
-            Transaction transaction = new Transaction(transactionDate, description, amount);
+            Transaction transaction = new Transaction(transactionDate, description, doubleAmount);
             transactions.add(transaction);
         }
 
@@ -144,13 +149,14 @@ public class TransactionExtractor {
             if (description.contains("Reload")) {
                 amount = "-" + amount;
             }
+            double doubleAmount = Double.valueOf(amount);
             // Skip transaction if GO+ is present
             if (description.contains("GO+ Daily Earnings") || description.contains("GO+ Cash In")) {
                 continue;
             }
 
             // Create Transaction object and add to list
-            Transaction transaction = new Transaction(transactionDate, description, amount);
+            Transaction transaction = new Transaction(transactionDate, description, doubleAmount);
             transactions.add(transaction);
         }
 
@@ -176,6 +182,9 @@ public class TransactionExtractor {
     public static void createExcel(List<Transaction> transactions, String filePath) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Transactions");
+            CellStyle decimalStyle = workbook.createCellStyle();
+            DataFormat dataFormat = workbook.createDataFormat();
+            decimalStyle.setDataFormat(dataFormat.getFormat("#,##0.00")); // Format for two decimal points
 
             // Create header row
             Row headerRow = sheet.createRow(0);
@@ -191,10 +200,17 @@ public class TransactionExtractor {
                 row.createCell(0).setCellValue(transaction.getTransactionDate());
                 row.createCell(1).setCellValue(transaction.getDescription());
                 sheet.autoSizeColumn(1);
-                row.createCell(2).setCellValue(transaction.getAmount());
+                Cell amountCell = row.createCell(2);
+                amountCell.setCellValue(transaction.getAmount());
+                amountCell.setCellStyle(decimalStyle); // Apply the decimal style to the amount column
             }
             
             sheet.autoSizeColumn(0);
+            
+            // Auto-size columns
+            for (int i = 0; i < headerRow.getLastCellNum(); i++) {
+                sheet.autoSizeColumn(i);
+            }
 
             // Write the workbook to a file
             try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
@@ -211,9 +227,9 @@ public class TransactionExtractor {
     static class Transaction {
         private String transactionDate;
         private String description;
-        private String amount;
+        private double amount;
 
-        public Transaction(String transactionDate, String description, String amount) {
+        public Transaction(String transactionDate, String description, double amount) {
             this.transactionDate = transactionDate;
             this.description = description;
             this.amount = amount;
@@ -227,7 +243,7 @@ public class TransactionExtractor {
             return description;
         }
 
-        public String getAmount() {
+        public double getAmount() {
             return amount;
         }
     }
