@@ -75,9 +75,13 @@ public class PDFConverterGUI extends JFrame {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     inputFileTextField.setText(selectedFile.getAbsolutePath());
+                    
                 }
                 String absoluteInputFilePath = inputFileTextField.getText();
                 globalInputFilePath = absoluteInputFilePath.substring(0, absoluteInputFilePath.lastIndexOf('\\'));
+                if(outputPathTextField.getText().equals("")) {
+                	outputPathTextField.setText(globalInputFilePath);
+                }
             }
         });
 

@@ -32,7 +32,7 @@ public class TransactionExtractor {
             String amount = amountStr.replaceAll(",", "");
 
             // Add negative sign if CR indicator is present
-            if (crIndicator != null && !crIndicator.isEmpty()) {
+            if (crIndicator == null || crIndicator.isEmpty()) {
                 amount = "-" + amount;
             }
             double doubleAmount = Double.valueOf(amount);
@@ -117,7 +117,7 @@ public class TransactionExtractor {
             
             
             // Add negative sign if CR indicator is present
-            if (crIndicator != null && !crIndicator.isEmpty()) {
+            if (crIndicator == null || crIndicator.isEmpty()) {
                 amount = "-" + amount;
             }
             double doubleAmount = Double.valueOf(amount);
@@ -146,10 +146,12 @@ public class TransactionExtractor {
             String amount = amountStr.replaceAll(",", "");
 
             // Add negative sign if Reload is present
-            if (description.contains("Reload")) {
+            if (!description.contains("Reload")) {
                 amount = "-" + amount;
             }
-            double doubleAmount = Double.valueOf(amount);
+            
+            amount = amount.replaceAll("[^0-9.-]", "");
+            double doubleAmount = Double.parseDouble(amount);
             // Skip transaction if GO+ is present
             if (description.contains("GO+ Daily Earnings") || description.contains("GO+ Cash In")) {
                 continue;
